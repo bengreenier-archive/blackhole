@@ -1,5 +1,5 @@
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+package Beta.Server;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.BindException;
@@ -10,9 +10,18 @@ import java.net.InetAddress;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-
-
+/**
+ * define a blackhole server,
+ * the class the recieves files
+ * @author B3N
+ *
+ */
 public class BlackholeServer {
+	
+	/**
+	 * the entry point
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		System.out.println("Starting Blackhole Server...");
 		BlackholeServer blackholeServer = new BlackholeServer();
@@ -43,6 +52,11 @@ public class BlackholeServer {
 	
 	private final int PORT = 53535;
 	
+	/**
+	 * start the server
+	 * @param exit_dir
+	 * @throws Exception
+	 */
 	public void Start(String exit_dir) throws Exception {
 		DatagramSocket serverSocket = new DatagramSocket(PORT);
 		byte[] receiveData;
@@ -73,7 +87,11 @@ public class BlackholeServer {
 				receivePacket = new DatagramPacket(receiveData, receiveData.length);
 				serverSocket.receive(receivePacket);
 				newFilename = new String(receivePacket.getData());
+				
+				
 				System.out.println("Creating new file "+newFilename+" at "+exit_dir);
+				
+				//read a File instance from places
 				newFile = new File(exit_dir, newFilename);
 				int fileNumber = 1;
 				while(newFile.exists()) {
@@ -166,6 +184,12 @@ public class BlackholeServer {
 			//serverSocket.send(sendPacket);
 		}
 	}
+	
+	/**
+	 * remove any blank entries from a byte[]
+	 * @param byteArray
+	 * @return
+	 */
 	private byte[] RemoveBlanks(byte[] byteArray) {
 		int end = 0;
 		for(int i = 0; i < byteArray.length; i++) {

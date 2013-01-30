@@ -1,23 +1,35 @@
+package Beta.Client;
 
 
-import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
+/**
+ * This class presents a runnable
+ * Client for the blackhole.
+ * @author the-tall-matt
+ *
+ */
 public class BlackholeClient {
 	final int PORT = 53535;
 	
+	/**
+	 * the entry point for the client application
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		System.out.println("Starting Blackhole Client...");
 		BlackholeClient blackholeClient = new BlackholeClient();
+		
+		//require a file argument to start the client.
 		if(args.length>0) {
 			blackholeClient.Start(args[0]);
 		} else {
@@ -25,6 +37,7 @@ public class BlackholeClient {
 		}
 	}
 	
+	//member variables
 	DatagramSocket clientSocket;
 	InetAddress IPAddress;
 	byte[] sendData;
@@ -35,6 +48,12 @@ public class BlackholeClient {
 	int packetSize = 49152;
 	boolean connected = false;
 	
+	/**
+	 * the start method for the client
+	 * this begins the transfer by prompting for 
+	 * a server to send to.
+	 * @param input_file
+	 */
 	public void Start(String input_file) {
 		Scanner keyboard = new Scanner(System.in);
 		for(int i = input_file.length()-1; i > 0; i--) {
@@ -65,7 +84,16 @@ public class BlackholeClient {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		keyboard.close();
 	}
+	
+	/**
+	 * this method sends the actual file 
+	 * to the given server
+	 * @param ipAddress
+	 * @param filename
+	 * @throws Exception
+	 */
 	public void Client(String ipAddress, String filename) throws Exception {
 		clientSocket = new DatagramSocket();
 		IPAddress = InetAddress.getByName(ipAddress);
@@ -77,11 +105,13 @@ public class BlackholeClient {
 		
 		System.out.print("Sending filename and extension...");
 		
+		//send a 0 ... not sure why //TODO find out why
 		sendData = new byte[1];
 		sendData[0]=0;
 		sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
 		clientSocket.send(sendPacket);
 		
+		//send filename
 		sendData = new byte[filename.getBytes().length];
 		sendData=filename.getBytes();
 		sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
@@ -107,11 +137,14 @@ public class BlackholeClient {
 		
 		System.out.println("Sent.");
 		System.out.print("Sending file data...");
+		
+		//send a 1, not sure why //TODO find out why
 		sendData = new byte[1];
 		sendData[0]=1;
 		sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
 		clientSocket.send(sendPacket);
 		clientSocket.setSoTimeout(750);
+		
 		// Send the data
 		while(bytesSent < numberOfPackets) {
 			sendData = new byte[packetSize];
@@ -141,11 +174,13 @@ public class BlackholeClient {
 			}
 		}
 		
+		//send something here..unknown //TODO find out what
 		sendData = new byte[fileSize%packetSize];
 		fis.read(sendData, 0, fileSize%packetSize);
 		sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, PORT);
 		clientSocket.send(sendPacket);
 		
+		//receive a bit to verify that transmission was a success.
 		receiveData = new byte[1];
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 		clientSocket.receive(receivePacket);
@@ -158,6 +193,13 @@ public class BlackholeClient {
 		fis.close();
 		clientSocket.close();
 	}
+	
+	/**
+	 * check a connection to an ipAddress
+	 * @param ipAddress
+	 * @return true if connected, false else
+	 * @throws Exception
+	 */
 	public boolean Connect(String ipAddress) throws Exception {
 		boolean safe = false;
 		
@@ -178,9 +220,21 @@ public class BlackholeClient {
 		connected = safe;
 		return safe;
 	}
+	
+	/**
+	 * Send the byte[] deck using
+	 * the send method
+	 * @return
+	 */
 	public boolean SendDeck() {
 		return Send(deck);
     }
+	
+	/**
+	 * send data to IPAddress which is a set string
+	 * @param data
+	 * @return
+	 */
     public boolean Send(byte[] data) {
     	boolean worked = false;
     	sendData = data;
@@ -193,6 +247,13 @@ public class BlackholeClient {
 		}
     	return worked;
     }
+    
+    /**
+     * return byte[] from a File
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public static byte[] getBytesFromFile(File file) throws IOException {        
         long length = file.length();
 
