@@ -45,7 +45,7 @@ public class UDPServer extends Thread{
 		//this is our central listening loop. the server thread will reside here
 		//until it is told to stop listening.
 		while(isListening) {
-			System.out.println(isListening);
+
 			//generate a chunk, to recieve the data into
 			Chunk<ByteArray> recievedChunk = new Chunk<ByteArray>(){
 
