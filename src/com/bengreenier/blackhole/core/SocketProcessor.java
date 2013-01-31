@@ -1,12 +1,13 @@
 package com.bengreenier.blackhole.core;
 
 import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import com.bengreenier.blackhole.util.ByteArray;
+import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Marker;
 
 /**
@@ -43,17 +44,14 @@ public class SocketProcessor extends Thread {
 								header = null;
 								noFooter = false;
 							}
-						}else if (header != null) {
+						}else if (header != null)
 							data.add(o);
 							
-							if (o instanceof File) {
-								//oh, files aren't serializable anyway....change this l8r
-								if (!new File(((File)o).getPath()).exists()
+							//check if this object is the content of a file, and write it to the FSYS if it is, and the file doesn't ready exist. [existence check should be optional?]
+							if (header instanceof Marker.FileHeaderMarker && o instanceof ByteArray) {
+								if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("filename")))
+									FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("filename"));
 							}
-							
-							//TODO pretty this up. its friggen midnight, and i'm writing a demo. btfo.
-						}
-								
 						
 					}
 						

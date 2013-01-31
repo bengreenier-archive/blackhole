@@ -1,14 +1,12 @@
 package com.bengreenier.blackhole.tests;
 
 
-public class FileReceiver extends Thread {
-
-	public FileReceiver() {
-		super();
-	}
-	
-	@Override
-	public void run() {
-		
-	}
+public class FileReceiver {
+	/**
+	 * I'll leave this here to remind people,
+	 * but a FileReceiver is BUILT IN to the 
+	 * TCPServer, so if you want to get files
+	 * from a FileSender, just run a TCPServer
+	 * 
+	 */
 }

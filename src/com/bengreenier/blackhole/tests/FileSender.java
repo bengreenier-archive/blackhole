@@ -6,6 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
+import com.bengreenier.blackhole.util.ByteArray;
+import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Marker;
 
 public class FileSender {
@@ -15,6 +17,7 @@ public class FileSender {
 		String serverAddress = "";
 		String serverPort = "";
 		String filePath = "";
+		String rename = "";
 		
 		for (int i=0;i<args.length; i++) {
 			if (args[i].toLowerCase().equals("--server"))
@@ -23,6 +26,18 @@ public class FileSender {
 				serverPort = args[i+1];
 			if (args[i].toLowerCase().equals("--file"))
 				filePath = args[i+1];
+			if (args[i].toLowerCase().equals("--rename"))
+				rename = args[i+1];
+		}
+		
+		if (args.length == 0) {
+			System.out.println("----Blackhole File Sender v1----");
+			System.out.println("\tOptions:");
+			System.out.println("\t--server <address>");
+			System.out.println("\t--port <server port>");
+			System.out.println("\t--file <local file path>");
+			System.out.println("\t--rename <remote file path> [optional]");
+			System.exit(0);
 		}
 		
 		if (serverAddress.length() == 0
@@ -47,8 +62,11 @@ public class FileSender {
 		
 		try {
 			ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
-			oout.writeObject(new Marker.FileHeaderMarker(filePath));
-			oout.writeObject(new File(filePath));
+			if (rename.equals(""))
+				oout.writeObject(new Marker.FileHeaderMarker(filePath));
+			else
+				oout.writeObject(new Marker.FileHeaderMarker(rename));
+			oout.writeObject(new ByteArray(FileIO.getByteArray(filePath)));
 			oout.writeObject(new Marker.GenericFooterMarker());
 			oout.close();
 			
