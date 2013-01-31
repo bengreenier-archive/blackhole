@@ -21,13 +21,13 @@ import com.bengreenier.blackhole.util.Chunks;
  * @author B3N
  *
  */
-public class Server extends Thread{
+public class UDPServer extends Thread{
 
 	private volatile boolean isListening;
 	private ArrayList<Chunk<ByteArray>> chunkList;
 	private volatile DatagramSocket serverSocket;
 	
-	public Server() {
+	public UDPServer() {
 		isListening = true;
 		
 		try {
@@ -141,7 +141,7 @@ public class Server extends Thread{
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Server svr = new Server();
+		UDPServer svr = new UDPServer();
 		svr.start();
 		System.out.print("Server is up\n\nType 'stop' to shutdown server: ");
 
