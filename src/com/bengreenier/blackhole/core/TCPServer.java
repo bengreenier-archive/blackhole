@@ -5,13 +5,14 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.bengreenier.blackhole.util.Transmitable;
 
 public class TCPServer extends Thread{
 
 	private ServerSocket serverSocket;
-	private CopyOnWriteArrayList<SocketProcessor> connections;
+	private CopyOnWriteArrayList<SocketProcessor> connections;//bad data structure choice //TODO fix
 	private volatile boolean isListening;
 	
 	public TCPServer() {
@@ -28,14 +29,19 @@ public class TCPServer extends Thread{
 			while (isListening) {
 				try{
 					//when a connection comes in, Socket t is made
+				Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO, "hanging for a socket to be accepted");
 					Socket t = serverSocket.accept();
+					System.out.println("socket accepted");
 					
 					if (t != null) {
 						
+						Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO,"non null, processing socket");
 						//create a processer for p, register it as a connection, and start it.
 						SocketProcessor sp = new SocketProcessor(t);
 						connections.add(sp);
 						sp.start();
+						
+						Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO,"socket processing");
 					}
 					
 				}catch(IOException e){
@@ -66,7 +72,7 @@ public class TCPServer extends Thread{
 	}
 	
 	public CopyOnWriteArrayList<SocketProcessor> getConnections() {
-		return connections;
+		return connections; //somethings wrong with this //TODO fix
 	}
 	
 	public static void main(String[] args) {
@@ -77,12 +83,14 @@ public class TCPServer extends Thread{
 		
 		Scanner in = new Scanner(System.in);
 		boolean more = true;
+		
+		
 		while (more && in.hasNext()) {
-			//output all data recieved on all sockets
 			for (SocketProcessor sp : tcp.getConnections())
 				if (sp.isDone())
-					for (Transmitable<?> t : sp.getData())
-						System.out.println(t.toString());
+					System.out.println("done");
+				else
+					System.out.println("not done");
 			
 			if (in.next().toLowerCase().equals("stop"))
 				more=!more;
