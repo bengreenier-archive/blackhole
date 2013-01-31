@@ -1,6 +1,7 @@
 package com.bengreenier.blackhole.core;
 
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -42,8 +43,16 @@ public class SocketProcessor extends Thread {
 								header = null;
 								noFooter = false;
 							}
-						}else if (header != null)
+						}else if (header != null) {
 							data.add(o);
+							
+							if (o instanceof File) {
+								//oh, files aren't serializable anyway....change this l8r
+								if (!new File(((File)o).getPath()).exists()
+							}
+							
+							//TODO pretty this up. its friggen midnight, and i'm writing a demo. btfo.
+						}
 								
 						
 					}

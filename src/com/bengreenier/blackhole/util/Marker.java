@@ -1,6 +1,7 @@
 package com.bengreenier.blackhole.util;
 
 import java.io.Serializable;
+import java.util.Properties;
 
 /**
  * lightweight interface used to mark
@@ -11,6 +12,33 @@ import java.io.Serializable;
  */
 public interface Marker extends Serializable {
 
+	public static class FileHeaderMarker implements Marker {
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3778423273633125161L;
+
+		private Properties prop;
+		
+		public FileHeaderMarker(String filename) {
+			prop = new Properties();
+			prop.setProperty("filename", filename);
+		}
+		
+		
+		@Override
+		public Properties getProperties() {
+			return prop;
+		}
+
+		@Override
+		public Type getType() {
+			return Type.HEADER;
+		}
+		
+	}
+
 	public static class GenericHeaderMarker implements Marker {
 
 		/**
@@ -19,7 +47,7 @@ public interface Marker extends Serializable {
 		private static final long serialVersionUID = -3195759607695097314L;
 
 		@Override
-		public String[] getProperties() {
+		public Properties getProperties() {
 			return null;
 		}
 
@@ -38,7 +66,7 @@ public interface Marker extends Serializable {
 		private static final long serialVersionUID = 4456730454239523115L;
 
 		@Override
-		public String[] getProperties() {
+		public Properties getProperties() {
 			return null;
 		}
 
@@ -57,7 +85,7 @@ public interface Marker extends Serializable {
 	 * 
 	 * @return
 	 */
-	public String[] getProperties();
+	public Properties getProperties();
 	
 	/**
 	 * what type of marker is this?
