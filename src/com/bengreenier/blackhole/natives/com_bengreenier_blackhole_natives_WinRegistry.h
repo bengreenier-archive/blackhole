@@ -10,26 +10,26 @@ extern "C" {
 /*
  * Class:     com_bengreenier_blackhole_natives_WinRegistry
  * Method:    writeKey
- * Signature: (Ljava/lang/String;)Z
+ * Signature: (ILjava/lang/String;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_bengreenier_blackhole_natives_WinRegistry_writeKey
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass, jint, jstring);
 
 /*
  * Class:     com_bengreenier_blackhole_natives_WinRegistry
  * Method:    writeValue
- * Signature: (Ljava/lang/String;Ljava/lang/String;I)Z
+ * Signature: (ILjava/lang/String;Ljava/lang/String;I)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_bengreenier_blackhole_natives_WinRegistry_writeValue
-  (JNIEnv *, jclass, jstring, jstring, jint);
+  (JNIEnv *, jclass, jint, jstring, jstring, jint);
 
 /*
  * Class:     com_bengreenier_blackhole_natives_WinRegistry
  * Method:    getValue
- * Signature: (Ljava/lang/String;)Ljava/lang/String;
+ * Signature: (ILjava/lang/String;)Ljava/lang/String;
  */
 JNIEXPORT jstring JNICALL Java_com_bengreenier_blackhole_natives_WinRegistry_getValue
-  (JNIEnv *, jclass, jstring);
+  (JNIEnv *, jclass, jint, jstring);
 
 #ifdef __cplusplus
 }
