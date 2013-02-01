@@ -8,6 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bengreenier.blackhole.sockproc.SocketProcessor;
+
 
 public class TCPServer extends Thread{
 
@@ -87,7 +89,7 @@ public class TCPServer extends Thread{
 		
 		while (more && in.hasNext()) {
 			for (SocketProcessor sp : tcp.getConnections())
-				if (sp.isDone())
+				if (sp.isComplete())
 					System.out.println("done");
 				else
 					System.out.println("not done");
