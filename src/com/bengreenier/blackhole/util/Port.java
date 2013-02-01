@@ -1,4 +1,4 @@
-package com.bengreenier.blackhole.core;
+package com.bengreenier.blackhole.util;
 
 /**
  * Define some statics we need

@@ -19,7 +19,7 @@ import com.bengreenier.blackhole.util.Marker;
  * @author B3N
  *
  */
-public class FileSocketProcessor extends AbstractSocketProcessor<Socket,Object>{
+public class FileSocketProcessor extends AbstractSocketProcessor<Object>{
 
 	private Socket socket; 
 	

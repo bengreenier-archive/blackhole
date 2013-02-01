@@ -1,13 +1,12 @@
 package com.bengreenier.blackhole.sockproc;
 
 /**
- * This is where T is a Socket type
- * and K is a processed Data type
+ * K is a processed Data type
  * @author B3N
  *
- * @param <T>
+ * @param <K>
  */
-public abstract class AbstractSocketProcessor<T,K> extends Thread implements SocketWorker<K>  {
+public abstract class AbstractSocketProcessor<K> extends Thread implements SocketWorker<K>  {
 
 	//a protected volatile boolean to shutdown the server
 	protected volatile boolean isListening = true;

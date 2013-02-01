@@ -14,7 +14,7 @@ import com.bengreenier.blackhole.util.Marker;
  * @author B3N
  *
  */
-public class SocketProcessor extends AbstractSocketProcessor<Socket,Object> {
+public class SocketProcessor extends AbstractSocketProcessor<Object> {
 
 	private Socket socket;
 	private volatile ArrayList<Object> list;
