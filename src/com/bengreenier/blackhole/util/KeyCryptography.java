@@ -11,6 +11,8 @@ import java.security.SecureRandom;
  * define the logic of 
  * configuring private and public
  * keys using rsa encrpytion
+ * 
+ * TODO serialize this class, as it must remain the same for the same pc! (aka session)
  * @author B3N
  *
  */

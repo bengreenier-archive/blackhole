@@ -1,15 +1,12 @@
 package com.bengreenier.blackhole.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
 
 /**
  * this class is designed to
@@ -21,46 +18,39 @@ import java.util.logging.Logger;
  */
 public class Lock {
 
-	private FileChannel channel;
-	private FileLock lock;
+	private ServerSocket socket;
 	
-	public Lock(String filename) {
+	public Lock(int port) {
 		try {
-			File file = new File(filename);
+			socket = new ServerSocket(port,10,InetAddress.getLocalHost());
 			
-			if (file.exists())
-				file.delete();
-			
-			FileOutputStream lockFileOS = new FileOutputStream(file);
-			lockFileOS.close();
-			
-			channel = new RandomAccessFile(file,"rw").getChannel();
-		
-			lock = channel.tryLock();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (OverlappingFileLockException e) {
-			lock = null;
+		} catch (java.net.BindException e) {
+			socket = null;
 		} catch (IOException e) {
+		
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 	}
 	
 	public boolean isLocked() {
-		if (lock == null)
+		if (socket == null)
 			return false;
+	
 		
-		Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO, "Lock is valid: "+lock.isValid());
-		Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO, "Lock is shared: "+lock.isShared());
+		Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO,"isClosed "+socket.isClosed());
 		
-		return lock.isValid();
+		if (!socket.isClosed())
+			return true;
+		else
+			return false;
 	}
 	
 	public void release() {
 		try {
-			lock.release();
-			
+			socket.close();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

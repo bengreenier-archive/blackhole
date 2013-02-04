@@ -22,11 +22,11 @@ import com.bengreenier.blackhole.util.Marker;
 public class FileSocketProcessor extends AbstractSocketProcessor<Object>{
 
 	private Socket socket; 
-	
+
 	public FileSocketProcessor(Socket socket) {
 		this.socket = socket;
 	}
-	
+
 	@Override
 	public void cleanCloseSocket() {
 		if (socket != null)
@@ -58,8 +58,16 @@ public class FileSocketProcessor extends AbstractSocketProcessor<Object>{
 							}
 						}else if (header != null)
 							if (header instanceof Marker.FileHeaderMarker && o instanceof ByteArray) {
-								if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("filename")))
-									FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("filename"));
+								if (((Marker.FileHeaderMarker)header).getProperties().getProperty("rename") == null) {
+									if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("filename")))
+										FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("filename"));
+								}else{
+									if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("rename")))
+										FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("rename"));
+								}
+								
+								header = null;
+								noFooter =true;
 							}
 					}
 					ois.close();
@@ -79,7 +87,7 @@ public class FileSocketProcessor extends AbstractSocketProcessor<Object>{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override

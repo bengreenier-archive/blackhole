@@ -2,6 +2,14 @@ package com.bengreenier.blackhole.core;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDragEvent;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -9,11 +17,17 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,7 +35,11 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import com.bengreenier.blackhole.util.ByteArray;
+import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Lock;
+import com.bengreenier.blackhole.util.Marker;
+import com.bengreenier.blackhole.util.Port;
 
 /**
  * The default state
@@ -46,12 +64,66 @@ public class UserBlackhole {
 	private Properties prop;
 	private Lock lock;
 	private JFrame frame;
+	private DropTarget dropTarget;
 
 	public UserBlackhole(String[] args) {
 		this.args = args;
 		this.prop = new Properties();
 		this.frame = new JFrame();
-		this.lock = new Lock("lock.lock");
+
+		this.dropTarget = new DropTarget(frame,new DropTargetListener(){
+
+			@Override
+			public void dragEnter(DropTargetDragEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void dragExit(DropTargetEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void dragOver(DropTargetDragEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public void drop(DropTargetDropEvent dtde) {
+				try {
+					// Ok, get the dropped object and try to figure out what it is
+					Transferable tr = dtde.getTransferable();
+					DataFlavor[] flavors = tr.getTransferDataFlavors();
+					for (int i = 0; i < flavors.length; i++) {
+						System.out.println("Possible flavor: " + flavors[i].getMimeType());
+						// Check for file lists specifically
+						if (flavors[i].isFlavorJavaFileListType()) {
+							dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
+							System.out.println("Good Drop!");
+
+							// And add the list of file names to our text area
+							java.util.List<Object> list = (java.util.List<Object>)tr.getTransferData(flavors[i]);
+
+							filesDropped(list);
+						}
+					}
+				}catch (Exception e) {
+
+				}
+			}
+
+			@Override
+			public void dropActionChanged(DropTargetDragEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
+		//this.lock = new Lock(Port.DEFAULT+1);
 
 		//try to load properties from ./blackhole.config	
 		try {
@@ -65,8 +137,8 @@ public class UserBlackhole {
 			e.printStackTrace();
 		}
 
-		if (lock.isLocked())
-			exit();
+		//if (lock.isLocked())
+		//askWindowExit();
 	}
 
 
@@ -213,10 +285,10 @@ public class UserBlackhole {
 
 		//i don't really like this line...
 		frame.dispose();
-		
+
 		//release the lock
-		lock.release();
-		
+		//lock.release();
+
 		return this;
 	}
 
@@ -236,6 +308,56 @@ public class UserBlackhole {
 			prop.setProperty("location-x", ""+(int)frame.getLocation().getX());
 			prop.setProperty("location-y", ""+(int)frame.getLocation().getY());
 		}
+	}
+
+	private void filesDropped(final java.util.List<Object> list) {
+		//TODO prompt for server information  
+		final String serverIP = "127.0.0.1";
+		final int port = Port.DEFAULT;
+
+		//open a thread to send the files.
+		new Thread(){
+			@Override
+			public void run(){
+
+				Socket socket = new Socket();
+				try {
+					socket.connect(new InetSocketAddress(serverIP,port));
+				} catch (NumberFormatException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					ObjectOutputStream oout = new ObjectOutputStream(socket.getOutputStream());
+
+					for (Object o : list) {
+						if (o instanceof File)
+							if (((File)o).exists()){
+								System.out.println("o.tostring = "+o.toString());
+								oout.writeObject(new Marker.FileHeaderMarker(((File)o).getPath(),((File)o).getPath().replace("\\","_").replace("/", "-").replace(":", "_")));
+								oout.writeObject(new ByteArray(FileIO.getByteArray(((File)o).getPath())));
+								oout.writeObject(new Marker.GenericFooterMarker());
+							}else{
+								Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO,"Dropped File doesn't exist");
+							}
+
+					}
+
+					oout.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				try {
+					socket.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 
