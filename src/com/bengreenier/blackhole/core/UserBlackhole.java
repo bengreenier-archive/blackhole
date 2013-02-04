@@ -71,7 +71,39 @@ public class UserBlackhole {
 		this.prop = new Properties();
 		this.frame = new JFrame();
 
-		this.dropTarget = new DropTarget(frame,new DropTargetListener(){
+		//just cause
+		Thread.currentThread().setName("UserBlackhole");
+		
+		
+		//this.lock = new Lock(Port.DEFAULT+1);
+
+				//try to load properties from ./blackhole.config	
+				try {
+					FileInputStream is = new FileInputStream("blackhole.config");
+					prop.loadFromXML(is);
+					is.close();
+				} catch (FileNotFoundException e) {
+					writePropDefaults();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		
+		//if (lock.isLocked())
+		//askWindowExit();
+	}
+
+
+	public UserBlackhole start() {
+		frame.setIconImage(new ImageIcon("res/blackhole.png").getImage());
+		frame.setTitle("Blackhole");
+		frame.setUndecorated(true);
+		frame.setBackground(new Color(0,0,0,0));
+		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 183, 179);
+		frame.setVisible(true);
+
+		
+		dropTarget = new DropTarget(frame,new DropTargetListener(){
 
 			@Override
 			public void dragEnter(DropTargetDragEvent arg0) {
@@ -123,33 +155,8 @@ public class UserBlackhole {
 			}
 
 		});
-		//this.lock = new Lock(Port.DEFAULT+1);
-
-		//try to load properties from ./blackhole.config	
-		try {
-			FileInputStream is = new FileInputStream("blackhole.config");
-			prop.loadFromXML(is);
-			is.close();
-		} catch (FileNotFoundException e) {
-			writePropDefaults();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		//if (lock.isLocked())
-		//askWindowExit();
-	}
-
-
-	public UserBlackhole start() {
-		frame.setIconImage(new ImageIcon("res/blackhole.png").getImage());
-		frame.setTitle("Blackhole");
-		frame.setUndecorated(true);
-		frame.setBackground(new Color(0,0,0,0));
-		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 183, 179);
-		frame.setVisible(true);
-
+		
+		
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e) {
 				exit();
