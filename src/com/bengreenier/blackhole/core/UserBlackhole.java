@@ -95,7 +95,7 @@ public class UserBlackhole {
 
 
 	public UserBlackhole start() {
-		frame.setIconImage(new ImageIcon("res/blackhole.png").getImage());
+		frame.setIconImage(new ImageIcon("res/drawable/blackhole.png").getImage());
 		frame.setTitle("Blackhole");
 		frame.setUndecorated(true);
 		frame.setBackground(new Color(0,0,0,0));
@@ -184,7 +184,7 @@ public class UserBlackhole {
 
 			}});
 
-		JLabel label = new JLabel(new ImageIcon("res/blackhole.png"));
+		JLabel label = new JLabel(new ImageIcon("res/drawable/blackhole.png"));
 		label.setBounds(0, 0,183,179);
 
 		JLabel xout = new JLabel("x");
