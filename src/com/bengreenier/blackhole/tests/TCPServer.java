@@ -2,12 +2,16 @@ package com.bengreenier.blackhole.tests;
 
 import java.util.Scanner;
 
-import com.bengreenier.blackhole.server.TCPFileProcessor;
+import com.bengreenier.blackhole.server.TCPProcessor;
 
-
-public class FileReceiver {
+/**
+ * a test of TCPProcessor
+ * @author B3N
+ *
+ */
+public class TCPServer extends Thread{
 	public static void main(String[] args) {
-		TCPFileProcessor tcp = new TCPFileProcessor();
+		TCPProcessor tcp = new TCPProcessor();
 		tcp.start();
 		
 		System.out.print("Server is up\n\nType 'stop' to shutdown server: ");

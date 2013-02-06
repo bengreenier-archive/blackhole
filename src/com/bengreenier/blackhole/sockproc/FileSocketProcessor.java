@@ -1,35 +1,47 @@
-package com.bengreenier.blackhole.core;
+package com.bengreenier.blackhole.sockproc;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 
 import com.bengreenier.blackhole.util.ByteArray;
 import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Marker;
 
 /**
- * Threaded object deserializer from
- * a network socket.
+ * This class is designed to
+ * only process File data from TCP sockets,
+ * all other data is ignored.
+ * 
+ * out return type is object, since it isn't used/is null
+ * 
  * @author B3N
  *
  */
-public class SocketProcessor extends Thread {
+public class FileSocketProcessor extends AbstractSocketProcessor<Object>{
 
-	private Socket socket;
-	private ArrayList<Object> data;
-	private volatile boolean completed;
-	
-	public SocketProcessor(Socket socket) {
+	private Socket socket; 
+
+	public FileSocketProcessor(Socket socket) {
 		this.socket = socket;
-		this.data = new ArrayList<Object>();
-		this.completed = false;
 	}
-	
+
+	@Override
+	public void cleanCloseSocket() {
+		if (socket != null)
+			if (!socket.isClosed())
+				try {
+					socket.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	}
+
 	@Override
 	public void run() {
+		//do the file logic reading code here
 		if (socket != null)
 			if (!socket.isClosed()) {
 				try {
@@ -45,16 +57,19 @@ public class SocketProcessor extends Thread {
 								noFooter = false;
 							}
 						}else if (header != null)
-							data.add(o);
-							
-							//check if this object is the content of a file, and write it to the FSYS if it is, and the file doesn't ready exist. [existence check should be optional?]
 							if (header instanceof Marker.FileHeaderMarker && o instanceof ByteArray) {
-								if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("filename")))
-									FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("filename"));
+								if (((Marker.FileHeaderMarker)header).getProperties().getProperty("rename") == null) {
+									if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("filename")))
+										FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("filename"));
+								}else{
+									if (!FileIO.exists(((Marker.FileHeaderMarker)header).getProperties().getProperty("rename")))
+										FileIO.writeByteArray(((ByteArray)o).getArray(), ((Marker.FileHeaderMarker)header).getProperties().getProperty("rename"));
+								}
+								
+								header = null;
+								noFooter =true;
 							}
-						
 					}
-						
 					ois.close();
 				} catch (EOFException e) {
 					//can we ignore this exception? i think we can and should safely be able to. but i've changed this like 100x times
@@ -66,25 +81,19 @@ public class SocketProcessor extends Thread {
 					e.printStackTrace();
 				}
 			}
-		
 		try {
 			socket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		completed = true;
-		
-		for (Object o : data) //TODO remove
-			System.out.println(o.toString());
+
 	}
-	
-	public boolean isDone() {
-		return completed;
+
+	@Override
+	public Object[] getData() {
+		//since we write files to the system, there is no return data.
+		return null;
 	}
-	
-	public ArrayList<Object> getData() {
-		return data;
-	}
+
 }
