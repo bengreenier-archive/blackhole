@@ -26,6 +26,11 @@ public interface Marker extends Serializable {
 			prop.setProperty("filename", filename);
 		}
 		
+		public FileHeaderMarker(String filename,String rename) {
+			prop = new Properties();
+			prop.setProperty("filename", filename);
+			prop.setProperty("rename",rename);
+		}
 		
 		@Override
 		public Properties getProperties() {
