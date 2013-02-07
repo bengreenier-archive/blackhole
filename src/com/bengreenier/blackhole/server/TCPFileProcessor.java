@@ -37,6 +37,7 @@ public class TCPFileProcessor extends AbstractServerProcessor<Object>{
 	@Override
 	public void cleanCloseServer() {
 		try {
+			isListening=false;
 			serverSocket.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

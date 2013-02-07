@@ -35,6 +35,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 
+import com.bengreenier.blackhole.server.TCPFileProcessor;
 import com.bengreenier.blackhole.util.ByteArray;
 import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Lock;
@@ -70,6 +71,7 @@ public class UserBlackhole {
 	int mouse_click_Y = 0;
 	
 	private String ipAddress = "127.0.0.1";
+	private TCPFileProcessor tcp;
 
 	public UserBlackhole(String[] args) {
 		this.args = args;
@@ -110,7 +112,10 @@ public class UserBlackhole {
 		frame.setBackground(new Color(0,0,0,0));
 		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 128, 128);
 		frame.setVisible(true);
-		ipAddress = prop.getProperty("ip_address");
+		ipAddress = prop.getProperty("ip-address");
+		
+		tcp = new TCPFileProcessor();
+		tcp.start();
 		
 		dropTarget = new DropTarget(frame,new DropTargetListener(){
 			@Override
@@ -243,6 +248,8 @@ public class UserBlackhole {
 			e.printStackTrace();
 		}
 
+		tcp.cleanCloseServer();
+		
 		//i don't really like this line...
 		frame.dispose();
 
@@ -289,7 +296,7 @@ public class UserBlackhole {
 			prop.setProperty("location-x", ""+(int)frame.getLocation().getX());
 			prop.setProperty("location-y", ""+(int)frame.getLocation().getY());
 		}
-		if(ipAddress != prop.getProperty("ip-address")) {
+		if(ipAddress!=null&&!ipAddress.equals(prop.getProperty("ip-address"))) {
 			prop.setProperty("ip-address", ipAddress);
 		}
 	}
