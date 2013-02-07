@@ -79,23 +79,28 @@ public class UserBlackhole {
 		//just cause
 		Thread.currentThread().setName("UserBlackhole");
 		
+		// see if the .config file exists, if not set the default values
+		File file = new File("blackhole.config");
+		if(!file.exists()) {
+			// make the file then populate it
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			writePropDefaults();
+		} 
 		
-		//this.lock = new Lock(Port.DEFAULT+1);
-
-				//try to load properties from ./blackhole.config	
-				try {
-					FileInputStream is = new FileInputStream("blackhole.config");
-					prop.loadFromXML(is);
-					is.close();
-				} catch (FileNotFoundException e) {
-					writePropDefaults();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		
-		//if (lock.isLocked())
-		//askWindowExit();
+		//try to load properties from ./blackhole.config	
+		try {
+			FileInputStream is = new FileInputStream(file);
+			prop.loadFromXML(is);
+			is.close();
+		} catch (FileNotFoundException e) {
+			writePropDefaults();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public UserBlackhole start() {
@@ -269,6 +274,14 @@ public class UserBlackhole {
 		prop.setProperty("location-x", "100");
 		prop.setProperty("location-y", "100");
 		prop.setProperty("ip-address", "127.0.0.1");
+		try {
+			FileOutputStream os = new FileOutputStream("blackhole.config");
+			prop.storeToXML(os, "");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void writePropExit() {
