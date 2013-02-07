@@ -1,9 +1,6 @@
 package com.bengreenier.blackhole.core;
 
 import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Image;
-import java.awt.Robot;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -72,7 +69,7 @@ public class UserBlackhole {
 	int mouse_click_X = 0;
 	int mouse_click_Y = 0;
 	
-	private String ip_address = "127.0.0.1";
+	private String ipAddress = "127.0.0.1";
 
 	public UserBlackhole(String[] args) {
 		this.args = args;
@@ -108,7 +105,7 @@ public class UserBlackhole {
 		frame.setBackground(new Color(0,0,0,0));
 		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 128, 128);
 		frame.setVisible(true);
-		ip_address = prop.getProperty("ip_address");
+		ipAddress = prop.getProperty("ip_address");
 		
 		dropTarget = new DropTarget(frame,new DropTargetListener(){
 			@Override
@@ -257,21 +254,21 @@ public class UserBlackhole {
 	
 	private void askSetIP() {
 		//this results is the window popping up a new input dialog to change the IP address
-		ip_address = (String)JOptionPane.showInputDialog(
+		ipAddress = (String)JOptionPane.showInputDialog(
 		                    frame,
 		                    "Enter in new IP address",
 		                    "Set IP",
 		                    JOptionPane.PLAIN_MESSAGE,
 		                    null,
 		                    null,
-		                    ip_address);
+		                    ipAddress);
 	}
 
 	private void writePropDefaults() {
 		prop.setProperty("save-location", "true");
 		prop.setProperty("location-x", "100");
 		prop.setProperty("location-y", "100");
-		prop.setProperty("ip_address", "127.0.0.1");
+		prop.setProperty("ip-address", "127.0.0.1");
 	}
 
 	private void writePropExit() {
@@ -279,8 +276,8 @@ public class UserBlackhole {
 			prop.setProperty("location-x", ""+(int)frame.getLocation().getX());
 			prop.setProperty("location-y", ""+(int)frame.getLocation().getY());
 		}
-		if(ip_address != prop.getProperty("ip_address")) {
-			prop.setProperty("ip_address", ip_address);
+		if(ipAddress != prop.getProperty("ip-address")) {
+			prop.setProperty("ip-address", ipAddress);
 		}
 	}
 
@@ -295,7 +292,7 @@ public class UserBlackhole {
 
 				Socket socket = new Socket();
 				try {
-					socket.connect(new InetSocketAddress(ip_address,port));
+					socket.connect(new InetSocketAddress(ipAddress,port));
 				} catch (NumberFormatException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
