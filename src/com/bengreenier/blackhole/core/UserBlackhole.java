@@ -85,9 +85,6 @@ public class UserBlackhole {
 		
 		
 		
-		
-		
-		
 		//see if the .config file exists, if not set the default value.
 		//there may be some redundancy here, addressing the below load. address in the future
 		File file = new File(StaticStrings.getString("config"));
@@ -113,8 +110,7 @@ public class UserBlackhole {
 		if (configFile != null)
 			try {
 				if (configFile.getChannel().tryLock() == null) {
-					System.out.println("CONFIG FILE IS LOCKED");
-					System.exit(-1);
+					System.exit(-2);
 				}
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
