@@ -38,7 +38,6 @@ import javax.swing.JPopupMenu;
 import com.bengreenier.blackhole.server.TCPFileProcessor;
 import com.bengreenier.blackhole.util.ByteArray;
 import com.bengreenier.blackhole.util.FileIO;
-import com.bengreenier.blackhole.util.Lock;
 import com.bengreenier.blackhole.util.Marker;
 import com.bengreenier.blackhole.util.Port;
 import com.bengreenier.blackhole.util.StaticStrings;
