@@ -25,6 +25,7 @@ public class StaticStrings {
 		//register our hardcoded static strings
 		map.put("config", "blackhole.config");
 		map.put("blackhole", "res/drawable/blackhole.png");
+		map.put("archive-location", "temp/update.zip");
 		
 	}
 	
