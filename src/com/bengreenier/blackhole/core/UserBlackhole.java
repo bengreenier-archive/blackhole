@@ -28,6 +28,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,6 +42,7 @@ import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Marker;
 import com.bengreenier.blackhole.util.Port;
 import com.bengreenier.blackhole.util.StaticStrings;
+import com.matthewmichaud.blackhole.graphics.Animation;
 
 /**
  * The default state
@@ -164,7 +166,6 @@ public class UserBlackhole {
 		frame.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent e) {
 				exit();
-
 			}
 		});
 		
@@ -186,8 +187,17 @@ public class UserBlackhole {
 
 			}});
 
-		JLabel label = new JLabel(new ImageIcon(StaticStrings.getString("blackhole")));
-		label.setBounds(0, 0,128,128);
+		int[] frames = {
+				0,0,
+				128,0
+		};
+		Animation animation = null;
+		try {
+			animation = new Animation(ImageIO.read(new File(StaticStrings.getString("blackhole_whole"))), frames, 128, 128);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		animation.setBounds(0, 0,128,128);
 		
 		final JPopupMenu rightClickMenu = new JPopupMenu();
 		JMenuItem rightClickExit = new JMenuItem("Exit");
@@ -229,7 +239,7 @@ public class UserBlackhole {
 					
 			}});
 
-		frame.add(label);
+		frame.add(animation);
 		
 		frame.repaint();
 		return this;
@@ -237,7 +247,6 @@ public class UserBlackhole {
 
 	public UserBlackhole exit() {
 		writePropExit();
-
 		//try to save properties to ./blackhole.config
 		try{
 			FileOutputStream os = new FileOutputStream("blackhole.config");
@@ -255,7 +264,7 @@ public class UserBlackhole {
 
 		//release the lock
 		//lock.release();
-
+		System.exit(0);
 		return this;
 	}
 
