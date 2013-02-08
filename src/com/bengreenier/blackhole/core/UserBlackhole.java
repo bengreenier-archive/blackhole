@@ -41,6 +41,7 @@ import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Lock;
 import com.bengreenier.blackhole.util.Marker;
 import com.bengreenier.blackhole.util.Port;
+import com.bengreenier.blackhole.util.StaticStrings;
 
 /**
  * The default state
@@ -65,8 +66,7 @@ public class UserBlackhole {
 	private Properties prop;
 	private Lock lock;
 	private JFrame frame;
-	private DropTarget dropTarget;
-	
+
 	int mouse_click_X = 0;
 	int mouse_click_Y = 0;
 	
@@ -81,8 +81,9 @@ public class UserBlackhole {
 		//just cause
 		Thread.currentThread().setName("UserBlackhole");
 		
-		// see if the .config file exists, if not set the default values
-		File file = new File("blackhole.config");
+		//see if the .config file exists, if not set the default value.
+		//there may be some redundancy here, addressing the below load. address in the future
+		File file = new File(StaticStrings.getString("config"));
 		if(!file.exists()) {
 			// make the file then populate it
 			try {
@@ -106,7 +107,7 @@ public class UserBlackhole {
 	}
 
 	public UserBlackhole start() {
-		frame.setIconImage(new ImageIcon("res/drawable/blackhole.png").getImage());
+		frame.setIconImage(new ImageIcon(StaticStrings.getString("blackhole")).getImage());
 		frame.setTitle("Blackhole");
 		frame.setUndecorated(true);
 		frame.setAlwaysOnTop(true);
@@ -118,7 +119,7 @@ public class UserBlackhole {
 		tcp = new TCPFileProcessor();
 		tcp.start();
 		
-		dropTarget = new DropTarget(frame,new DropTargetListener(){
+		new DropTarget(frame,new DropTargetListener(){
 			@Override
 			public void dragEnter(DropTargetDragEvent arg0) {
 				// TODO Auto-generated method stub
@@ -139,11 +140,11 @@ public class UserBlackhole {
 					Transferable tr = dtde.getTransferable();
 					DataFlavor[] flavors = tr.getTransferDataFlavors();
 					for (int i = 0; i < flavors.length; i++) {
-						System.out.println("Possible flavor: " + flavors[i].getMimeType());
+						//System.out.println("Possible flavor: " + flavors[i].getMimeType());
 						// Check for file lists specifically
 						if (flavors[i].isFlavorJavaFileListType()) {
 							dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-							System.out.println("Good Drop!");
+							//System.out.println("Good Drop!");
 							// And add the list of file names to our text area
 							java.util.List<Object> list = (java.util.List<Object>)tr.getTransferData(flavors[i]);
 							filesDropped(list);
@@ -187,7 +188,7 @@ public class UserBlackhole {
 
 			}});
 
-		JLabel label = new JLabel(new ImageIcon("res/drawable/blackhole.png"));
+		JLabel label = new JLabel(new ImageIcon(StaticStrings.getString("blackhole")));
 		label.setBounds(0, 0,128,128);
 		
 		final JPopupMenu rightClickMenu = new JPopupMenu();
@@ -283,7 +284,7 @@ public class UserBlackhole {
 		prop.setProperty("location-y", "100");
 		prop.setProperty("ip-address", "127.0.0.1");
 		try {
-			FileOutputStream os = new FileOutputStream("blackhole.config");
+			FileOutputStream os = new FileOutputStream(StaticStrings.getString("config"));
 			prop.storeToXML(os, "");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -326,7 +327,7 @@ public class UserBlackhole {
 					for (Object o : list) {
 						if (o instanceof File)
 							if (((File)o).exists()){
-								System.out.println("o.tostring = "+o.toString());
+								//System.out.println("o.tostring = "+o.toString());
 								oout.writeObject(new Marker.FileHeaderMarker(((File)o).getPath(),((File)o).getPath().replace("\\","_").replace("/", "-").replace(":", "_")));
 								oout.writeObject(new ByteArray(FileIO.getByteArray(((File)o).getPath())));
 								oout.writeObject(new Marker.GenericFooterMarker());
