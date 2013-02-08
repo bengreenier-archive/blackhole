@@ -16,12 +16,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Properties;
@@ -64,7 +66,9 @@ public class UserBlackhole {
 	private String[] args;
 	private Properties prop;
 	private JFrame frame;
-
+	private RandomAccessFile configFile;
+	
+	
 	int mouse_click_X = 0;
 	int mouse_click_Y = 0;
 	
@@ -79,29 +83,61 @@ public class UserBlackhole {
 		//just cause
 		Thread.currentThread().setName("UserBlackhole");
 		
+		
+		
 		//see if the .config file exists, if not set the default value.
 		//there may be some redundancy here, addressing the below load. address in the future
 		File file = new File(StaticStrings.getString("config"));
 		if(!file.exists()) {
-			// make the file then populate it
+			// make the file then populate it with defaults
 			try {
 				file.createNewFile();
+				writePropDefaults();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			writePropDefaults();
+			
 		} 
+		
+		
+		//configure the configFile to be locked
+		try {
+			configFile = new RandomAccessFile(StaticStrings.getString("config"),"rw");
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+		
+		if (configFile != null)
+			try {
+				if (configFile.getChannel().tryLock() == null) {
+					System.exit(-2);
+				}
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
 		
 		//try to load properties from ./blackhole.config	
 		try {
-			FileInputStream is = new FileInputStream(file);
+			ByteArrayInputStream is = new ByteArrayInputStream(FileIO.getByteArray(configFile));
 			prop.loadFromXML(is);
 			is.close();
 		} catch (FileNotFoundException e) {
-			writePropDefaults();
+			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		
+		//rewind
+		if (configFile!=null)
+			try {
+				configFile.seek(0);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	}
 
 	public UserBlackhole start() {
@@ -239,14 +275,26 @@ public class UserBlackhole {
 		writePropExit();
 
 		//try to save properties to ./blackhole.config
-		try{
-			FileOutputStream os = new FileOutputStream("blackhole.config");
-			prop.storeToXML(os, null);
+				try{
+					ByteArrayOutputStream os = new ByteArrayOutputStream();
+					prop.storeToXML(os, null);
 
-			os.close();
-		}catch (Exception e) {
-			e.printStackTrace();
-		}
+					FileIO.writeByteArray(configFile, os.toByteArray());
+					
+				}catch (Exception e) {
+					e.printStackTrace();
+				}
+		
+		//try to close config file
+		if (configFile != null)
+			try {
+				configFile.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		
+		
 
 		tcp.cleanCloseServer();
 		
