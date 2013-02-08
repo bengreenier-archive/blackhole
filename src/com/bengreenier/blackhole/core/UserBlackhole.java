@@ -63,7 +63,6 @@ public class UserBlackhole {
 
 	private String[] args;
 	private Properties prop;
-	private Lock lock;
 	private JFrame frame;
 
 	int mouse_click_X = 0;
