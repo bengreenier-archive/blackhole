@@ -109,6 +109,7 @@ public class UserBlackhole {
 		frame.setIconImage(new ImageIcon("res/drawable/blackhole.png").getImage());
 		frame.setTitle("Blackhole");
 		frame.setUndecorated(true);
+		frame.setAlwaysOnTop(true);
 		frame.setBackground(new Color(0,0,0,0));
 		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 128, 128);
 		frame.setVisible(true);
