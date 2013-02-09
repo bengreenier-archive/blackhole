@@ -23,9 +23,12 @@ public class StaticStrings {
 		map = new HashMap<String,String>();
 		
 		//register our hardcoded static strings
-		map.put("config", "blackhole.config");
+		map.put("blackhole-config", "blackhole.config");
+		map.put("update-config", "update.config");
 		map.put("blackhole", "res/drawable/blackhole.png");
 		map.put("archive-location", "temp/update.zip");
+		map.put("installer-jar", "Installer.jar");
+		map.put("blackhole-jar", "Blackhole.jar");
 		
 	}
 	

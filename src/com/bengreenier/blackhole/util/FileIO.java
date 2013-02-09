@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -108,6 +109,19 @@ public class FileIO {
 			result = (new File(file)).createNewFile();
 		
 		return result;
+	}
+	
+	public static void writeUrlToFile(String url, String filename) throws IOException {
+		URL site = new URL(url);
+		InputStream is = site.openStream();
+		byte[] arr = getByteArray(is);
+		
+		if (new File(filename).exists())
+			new File(filename).delete();
+		
+			writeByteArray(arr,filename);
+		
+		is.close();
 	}
 
 

@@ -34,6 +34,7 @@ public class Updater {
 		this.remoteLocation = remoteLocation;
 		this.prop = new Properties();
 		
+		
 		try {
 			prop.loadFromXML(new FileInputStream(localLocation));
 		} catch (InvalidPropertiesFormatException e) {
@@ -54,9 +55,10 @@ public class Updater {
 		os.close();
 	}
 
-	public void update() throws IOException {
+	public boolean update() throws IOException {
 		URL url = new URL(remoteLocation);
 
+		boolean result = false;
 		InputStream is = url.openStream();
 		Properties t = new Properties();
 		t.loadFromXML(is);		
@@ -69,15 +71,18 @@ public class Updater {
 				if (prop.containsKey(key))
 					if (key.contains("-version")) {
 						Float f = Float.parseFloat(prop.getProperty(key));
-						if (f < Float.parseFloat(value))
+						if (f < Float.parseFloat(value)) {
+							result = true;
 							callUpdate(t);
+						}
 						
 						prop.setProperty(key, value);
 					}
 
 			}
 		}
-
+		
+		return result;
 	}
 
 	public Properties prop() {
@@ -95,7 +100,6 @@ public class Updater {
 		
 		FileIO.makeFileAtLocation(file.getPath());
 			
-		
 		FileOutputStream fis = new FileOutputStream(StaticStrings.getString("archive-location"));
 		fis.write(arr);
 		fis.close();

@@ -43,6 +43,7 @@ import com.bengreenier.blackhole.util.FileIO;
 import com.bengreenier.blackhole.util.Marker;
 import com.bengreenier.blackhole.util.Port;
 import com.bengreenier.blackhole.util.StaticStrings;
+import com.bengreenier.blackhole.util.Updater;
 
 /**
  * The default state
@@ -63,6 +64,7 @@ public class UserBlackhole {
 		new UserBlackhole(args).start();
 	}
 
+	@SuppressWarnings("unused")
 	private String[] args;
 	private Properties prop;
 	private JFrame frame;
@@ -83,11 +85,32 @@ public class UserBlackhole {
 		//just cause
 		Thread.currentThread().setName("UserBlackhole");
 		
+		//run an update check, updating if needed. except, i don't think this will really
+		//allow updating, cause the .jar will be running, so the .jar should be killed and
+		//then the Installer.jar should be executed.
+		Updater u = new Updater(StaticStrings.getString("update-config"),"http://bengreenier.com/blackhole/update.xml");
 		
+		//replace the installer with the latest from the web. this could probs be done a little better.
+		try {
+			FileIO.writeUrlToFile("http://bengreenier.com/blackhole/Installer.jar",StaticStrings.getString("installer-jar"));
+		} catch (IOException e3) {
+			// TODO Auto-generated catch block
+			e3.printStackTrace();
+		}
+		
+		try {
+			if (u.update()) {
+				u.storeToXML();
+				Runtime.getRuntime().exec("java -jar "+StaticStrings.getString("installer-jar"));
+				System.exit(-2);
+			}	
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
 		
 		//see if the .config file exists, if not set the default value.
 		//there may be some redundancy here, addressing the below load. address in the future
-		File file = new File(StaticStrings.getString("config"));
+		File file = new File(StaticStrings.getString("blackhole-config"));
 		if(!file.exists()) {
 			// make the file then populate it with defaults
 			try {
@@ -102,7 +125,7 @@ public class UserBlackhole {
 		
 		//configure the configFile to be locked
 		try {
-			configFile = new RandomAccessFile(StaticStrings.getString("config"),"rw");
+			configFile = new RandomAccessFile(StaticStrings.getString("blackhole-config"),"rw");
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
@@ -330,7 +353,7 @@ public class UserBlackhole {
 		prop.setProperty("location-y", "100");
 		prop.setProperty("ip-address", "127.0.0.1");
 		try {
-			FileOutputStream os = new FileOutputStream(StaticStrings.getString("config"));
+			FileOutputStream os = new FileOutputStream(StaticStrings.getString("blackhole-config"));
 			prop.storeToXML(os, "");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

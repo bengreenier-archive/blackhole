@@ -28,22 +28,19 @@ public class Installer {
 	private JFileChooser fc;
 	private int counter;
 
-	/**
-	 * Launch the application.
-	 */
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Installer window = new Installer();
-					window.frmInstaller.setVisible(true);
+					new Installer();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
 	}
-
+	
 	/**
 	 * Create the application.
 	 */
@@ -61,7 +58,7 @@ public class Installer {
 				complete();
 			} else {
 				JOptionPane.showMessageDialog(frmInstaller, "Update archive not selected. Exiting installer.");
-				System.exit(-1);
+				delete();
 			}
 		}
 			
@@ -78,6 +75,7 @@ public class Installer {
 		frmInstaller.setBounds(100, 100, 390, 160);
 		frmInstaller.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmInstaller.getContentPane().setLayout(null);
+		frmInstaller.setVisible(true);
 		
 		progressBar = new JProgressBar();
 		progressBar.setBounds(125, 70, 146, 14);
@@ -177,6 +175,10 @@ public class Installer {
 	
 	private void complete() {
 		JOptionPane.showMessageDialog(frmInstaller, "Update Complete.");
-		System.exit(0);
+		delete();
+	}
+	
+	private void delete() {
+		frmInstaller.dispose();
 	}
 }
