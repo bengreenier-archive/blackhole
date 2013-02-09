@@ -101,7 +101,7 @@ public class UserBlackhole {
 		try {
 			if (u.update()) {
 				u.storeToXML();
-				Runtime.getRuntime().exec("java -jar "+StaticStrings.getString("installer-jar"));
+				Runtime.getRuntime().exec("java -jar "+StaticStrings.getString("installer-jar")); //this isn't perfect seemingly, cause we wait for exec to finish.
 				System.exit(-2);
 			}	
 		} catch (IOException e2) {
