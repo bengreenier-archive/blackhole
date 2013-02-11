@@ -164,6 +164,9 @@ public class UserBlackhole {
 	}
 
 	public UserBlackhole start() {
+		
+		Logger.getLogger("com.bengreenier.blackhole").log(Level.INFO, "UserBlackhole Starting...");
+		
 		frame.setIconImage(new ImageIcon(StaticStrings.getString("blackhole")).getImage());
 		frame.setTitle("Blackhole");
 		frame.setUndecorated(true);
