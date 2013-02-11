@@ -26,6 +26,7 @@ public class StaticStrings {
 		map.put("config", "blackhole.config");
 		map.put("blackhole", "res/drawable/blackhole.png");
 		map.put("blackhole_whole", "res/drawable/blackhole_whole.png");
+		map.put("syncer","res/drawable/syncer.png");
 		
 	}
 	
