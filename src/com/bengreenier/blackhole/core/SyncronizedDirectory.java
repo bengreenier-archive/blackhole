@@ -79,6 +79,7 @@ public class SyncronizedDirectory {
 							}
 						}
 						temp.remove(f);
+						
 					}
 				}
 			}
@@ -90,12 +91,14 @@ public class SyncronizedDirectory {
 				recurse(root);
 				
 				if (temp.size()>0) {
-					for (File f : temp.keySet())
+					for (File f : temp.keySet()) {
+						hashes.remove(f);//delete the hash
 						try {
 							si.removeFile(f);
 						} catch (SyncronizedDirectoryException e) {
 							e.printStackTrace();
 						}
+					}
 				}
 				temp.clear();//just to be sure. even though we WILL recreate it
 
@@ -111,6 +114,11 @@ public class SyncronizedDirectory {
 
 	/**
 	 * test case, shows example usage of this class.
+	 * 
+	 * unfortunately, this method for syncdir is not
+	 * as efficient (memory wise) as i would like. so
+	 * it will need to be readdressed at some point TODO
+	 * 
 	 * @param args
 	 * @throws SyncronizedDirectoryException 
 	 */
