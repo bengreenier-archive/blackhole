@@ -113,6 +113,8 @@ public class SyncronizedDirectory {
 	 * @throws SyncronizedDirectoryException 
 	 */
 	public static void main(String[] args) throws SyncronizedDirectoryException {
+		
+		
 		SyncronizedDirectory sd = new SyncronizedDirectory(1000, ".", new SyncInterface(){
 
 			@Override
