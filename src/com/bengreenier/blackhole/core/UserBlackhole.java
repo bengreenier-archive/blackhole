@@ -279,6 +279,17 @@ public class UserBlackhole {
 					ByteArrayOutputStream os = new ByteArrayOutputStream();
 					prop.storeToXML(os, null);
 
+					
+					//rewind
+					if (configFile!=null)
+						try {
+							configFile.setLength(0);
+							configFile.seek(0);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					
 					FileIO.writeByteArray(configFile, os.toByteArray());
 					
 				}catch (Exception e) {
