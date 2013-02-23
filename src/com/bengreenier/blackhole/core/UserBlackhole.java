@@ -280,7 +280,7 @@ public class UserBlackhole {
 					prop.storeToXML(os, null);
 
 					
-					//rewind
+					//erase and rewind
 					if (configFile!=null)
 						try {
 							configFile.setLength(0);
