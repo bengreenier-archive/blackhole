@@ -1,6 +1,12 @@
 package com.bengreenier.blackhole.core;
 
+import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.dnd.DnDConstants;
@@ -23,7 +29,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URL;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -104,144 +112,61 @@ public class UserBlackhole {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		LoadTray();
 	}
+	private void LoadTray() {
+		// Add the icon to the system tray
+		final SystemTray tray = SystemTray.getSystemTray();
+		final TrayIcon trayIcon = new TrayIcon(createImage("res/drawable/icon.png", "Tray Icon"));
+		PopupMenu popup = new PopupMenu();
+		
+		MenuItem stahpItem = new MenuItem("Stahp");
+		MenuItem ipItem = new MenuItem("Set IP");
+		
+		popup.add(ipItem);
+		popup.add(stahpItem);
+		
+		trayIcon.setPopupMenu(popup);
+		
+		stahpItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                tray.remove(trayIcon);
+                askWindowExit();
+            }
+        });
+		ipItem.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				askSetIP();
+			}
+		});
+		
+		try {
+			tray.add(trayIcon);
+		} catch (AWTException e) {
+			System.out.println("TrayIcon could not be added");
+		}
+	}
+	//Obtain the image
+    protected static Image createImage(String path, String description) {
+    	Image image = null;
+		try {
+			image = ImageIO.read(new File(path));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if(image == null) {
+			System.out.println("Image was null");
+		}
+    	return image;
+    }
 
 	public UserBlackhole start() {
-		frame.setIconImage(new ImageIcon(StaticStrings.getString("blackhole")).getImage());
-		frame.setTitle("Blackhole");
-		frame.setUndecorated(true);
-		frame.setAlwaysOnTop(true);
-		frame.setBackground(new Color(0,0,0,0));
-		frame.setBounds(Integer.parseInt(prop.getProperty("location-x")), Integer.parseInt(prop.getProperty("location-y")), 128, 128);
-		frame.setVisible(true);
 		ipAddress = prop.getProperty("ip-address");
 		
 		tcp = new TCPFileProcessor();
 		tcp.start();
-		
-		new DropTarget(frame,new DropTargetListener(){
-			@Override
-			public void dragEnter(DropTargetDragEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void dragExit(DropTargetEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@Override
-			public void dragOver(DropTargetDragEvent arg0) {
-				// TODO Auto-generated method stub
-			}
-			@SuppressWarnings("unchecked")
-			@Override
-			public void drop(DropTargetDropEvent dtde) {
-				try {
-					// Ok, get the dropped object and try to figure out what it is
-					Transferable tr = dtde.getTransferable();
-					DataFlavor[] flavors = tr.getTransferDataFlavors();
-					for (int i = 0; i < flavors.length; i++) {
-						//System.out.println("Possible flavor: " + flavors[i].getMimeType());
-						// Check for file lists specifically
-						if (flavors[i].isFlavorJavaFileListType()) {
-							dtde.acceptDrop(DnDConstants.ACTION_COPY_OR_MOVE);
-							//System.out.println("Good Drop!");
-							// And add the list of file names to our text area
-							java.util.List<Object> list = (java.util.List<Object>)tr.getTransferData(flavors[i]);
-							filesDropped(list);
-						}
-					}
-				}catch (Exception e) {
-				}
-			}
-
-			@Override
-			public void dropActionChanged(DropTargetDragEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-		});
-		
-		
-		frame.addWindowListener(new WindowAdapter(){
-			public void windowClosing(WindowEvent e) {
-				exit();
-			}
-		});
-		
-		frame.addMouseMotionListener(new MouseMotionListener(){
-			
-			@Override
-			public void mouseDragged(MouseEvent arg0) {
-				if (arg0.getButton() == 0) {
-					int oX = (int)(arg0.getXOnScreen()-mouse_click_X);
-					int oY = (int)(arg0.getYOnScreen()-mouse_click_Y);
-					
-					frame.setLocation(oX, oY);
-				}
-			}
-			
-			@Override
-			public void mouseMoved(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-
-			}});
-
-		int[] frames = {
-				0,0,
-				128,0
-		};
-		Animation animation = null;
-		try {
-			animation = new Animation(ImageIO.read(new File(StaticStrings.getString("blackhole_whole"))), frames, 128, 128);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-		animation.setBounds(0, 0,128,128);
-		
-		final JPopupMenu rightClickMenu = new JPopupMenu();
-		JMenuItem rightClickExit = new JMenuItem("Exit");
-		rightClickExit.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				askWindowExit();
-			}});
-		JMenuItem rightClickIP = new JMenuItem("Set IP");
-		rightClickIP.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				askSetIP();
-			}});
-		rightClickMenu.add(rightClickIP);
-		rightClickMenu.add(rightClickExit);
-
-		frame.addMouseListener(new MouseListener(){
-
-			@Override
-			public void mouseClicked(MouseEvent arg0) {}
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				mouse_click_X = arg0.getX();
-				mouse_click_Y = arg0.getY();
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				if (arg0.getButton() == MouseEvent.BUTTON3)
-					rightClickMenu.show(frame, arg0.getX(),arg0.getY());
-					
-			}});
-
-		frame.add(animation);
-		
-		frame.repaint();
 		return this;
 	}
 
